@@ -12,8 +12,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        
 
+        <Image Source="References/Images/Мастер пол.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,5,5"/>
         <Frame x:Name="MainFrame" Grid.Row="1" Source="Pages/DiscountPage.xaml" Navigated="OnNavigated" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>

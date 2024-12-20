@@ -204,46 +204,37 @@ namespace UP_0._2_Trubarov.Pages
                 }
 
                 // Работа с партнером
-                if (currentPartner != null) // Редактирование
+                if (currentPartner != null)
                 {
-                    if (MessageBox.Show(
-                        "Вы уверены, что хотите сохранить изменения?",
-                        "Подтверждение",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    var attachedPartner = db.Partners.Find(currentPartner.ID);
+                    if (attachedPartner == null)
                     {
+                        MessageBox.Show("Партнёр не найден в текущем контексте.");
                         return;
                     }
 
-                    // Обновление данных партнера
-                    currentPartner.partnerName = NameOrganization;
-                    currentPartner.Director = DirectorOrganization;
-                    currentPartner.partnerEmail = EmailOrganization;
-                    currentPartner.partnerPhone = NumberOrganization;
-                    currentPartner.partnerINN = INNOrganization;
-                    currentPartner.partnerAdress = AddressOrganization;
-                    currentPartner.partnerRating = ratingValue;
-                    currentPartner.partnerTypeID = (int)selectedType;
+                    // Привязываем данные для редактирования
+                    attachedPartner.partnerName = NameOrganization;
+                    attachedPartner.Director = DirectorOrganization;
+                    attachedPartner.partnerEmail = EmailOrganization;
+                    attachedPartner.partnerPhone = NumberOrganization;
+                    attachedPartner.partnerINN = INNOrganization;
+                    attachedPartner.partnerAdress = AddressOrganization;
+                    attachedPartner.partnerRating = ratingValue;
+                    attachedPartner.partnerTypeID = selectedType;
 
-                    db.SaveChanges();
-
-                    int partnerId = currentPartner.ID;
-
-                    var partnerProduct = db.PartnerProducts
-                                           .FirstOrDefault(pp => pp.partnerID == partnerId);
+                    var partnerProduct = db.PartnerProducts.FirstOrDefault(pp => pp.partnerID == attachedPartner.ID);
 
                     if (partnerProduct != null)
                     {
                         partnerProduct.productID = selectedProductID ?? partnerProduct.productID;
-                        partnerProduct.quantityProduct = int.TryParse(quantity, out int quantityValue)
-                            ? quantityValue
-                            : partnerProduct.quantityProduct;
+                        partnerProduct.quantityProduct = int.TryParse(quantity, out int quantityValue) ? quantityValue : partnerProduct.quantityProduct;
                     }
                     else if (selectedProductID.HasValue && int.TryParse(quantity, out int quantityValue))
                     {
                         db.PartnerProducts.Add(new PartnerProducts
                         {
-                            partnerID = partnerId,
+                            partnerID = attachedPartner.ID,
                             productID = selectedProductID.Value,
                             quantityProduct = quantityValue,
                             dateSell = DateTime.Now
@@ -251,11 +242,7 @@ namespace UP_0._2_Trubarov.Pages
                     }
 
                     db.SaveChanges();
-                    MessageBox.Show(
-                        "Данные партнера успешно обновлены.",
-                        "Успех",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                    MessageBox.Show("Данные партнёра успешно обновлены.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else // Создание нового партнера
                 {
